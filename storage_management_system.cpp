@@ -76,7 +76,8 @@ int readFromFile(string filename) {
     return 0;
 }
 
-int sell_product(string file_name);
+int sellProduct(string file_name);
+int searchProduct(string file_name);
 
 int main() {
     Item item;
@@ -86,6 +87,7 @@ int main() {
     cout << "1: Pievienot produktu" << endl;
     cout << "2: Paradit visus produktus" << endl;
     cout << "3: Pardot produktu" << endl;
+    cout << "4: Meklet produktu" << endl;
     while (true){
         cout << endl << "Izvele: ";
         cin >> menuItem;
@@ -102,7 +104,10 @@ int main() {
             readFromFile(FILE_NAME);
             break;
         case 3:
-            sell_product(FILE_NAME);
+            sellProduct(FILE_NAME);
+            break;
+        case 4:
+            searchProduct(FILE_NAME);
             break;
         default:
             cout << "\nKluda! Nepareiza izvelne!" << endl;
@@ -112,32 +117,73 @@ int main() {
     return 0;
 }
 
-int sell_product(string file_name){
+int sellProduct(string fileName){
     Item product;
-    Item sold_product;
-    fstream file;
-    char sold_name[20];
+    Item soldProduct;
+    char soldName[20];
     double quantity;
     double sold;
+    fstream fileObj(fileName, ios::in | ios::out | ios::binary);
     
     cout << "Kuru produktu pardod?" << endl;
-    cin >> sold_name;
+    cin >> soldName;
     cin.clear();
     cin.ignore(1000, '\n');
 
-    file.open(file_name, ios::in|ios::binary);
+    fileObj.open(fileName);
     while (true){
-        file.read((char*)&product, sizeof(product));
-        if (!strcmp(sold_name, product.itemName)){
+        fileObj.read((char*)&product, sizeof(product));
+        if (!strcmp(soldName, product.itemName)){
+            
             return 0;
         }
-        else if (file.eof()){
+        else if (fileObj.eof()){
             cout << "Kluda: produkta ievade!" << endl;
             return 0;
         }
     }
-    quantity = product.itemQuantity;
-    sold = product.itemsSold;
+
+    strcpy(soldProduct.itemName, product.itemName);
+    soldProduct.itemQuantity = product.itemQuantity - (double)1;
+    soldProduct.itemsSold = product.itemsSold + (double)1;
+
+    fileObj.write((char*)&soldProduct, sizeof(soldProduct));
+    
+    return 0;
+}
+
+int searchProduct(string fileName){
+    Item product;
+    ifstream file;
+    string productName;
+
+    cout << "Meklet prouktu: ";
+    getline(cin, productName);
+
+    file.open(fileName,ios::in);
+    if (!file){
+        cout << "Kluda atverot failu" << endl;
+        return -1;
+    }
+    if (file.read((char*)&product, sizeof(product))){
+        while (!file.eof()){
+            if (product.getItemName() == productName){
+                cout << endl
+                     << left << setw(15) << "Nosaukums"
+                     << left << setw(15) << "Cena"
+                     << left << setw(15) << "Pieejams"
+                     << left << setw(15) << "Pardots" << endl;
+                product.displayItem();
+                break;
+            }
+            file.read((char*)&product, sizeof(product));
+        }
+    }
+    else {
+        cout << "Kluda nolasot no faila" << endl;
+        return -1;
+    }
     file.close();
+    cout << endl;
     return 0;
 }
