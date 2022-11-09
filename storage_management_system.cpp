@@ -9,9 +9,6 @@
 using namespace std;
 
 class Item {
-// private:
-//     char itemName[20];
-//     double itemPrice, itemQuantity, itemsSold;
 public:
     char itemName[20];
     double itemPrice, itemQuantity, itemsSold;
@@ -36,47 +33,8 @@ public:
     char *getItemName() { return itemName; }
 };
 
-int writeToFile(Item item, string filename) {
-    item.readItem();
-    fstream file;
-    file.open(filename, ios::out|ios::binary|ios::app);
-    if (!file){
-        cout << "Kluda rakstot faila" << endl;
-        return -1;
-    }
-    file.write((char*)&item,sizeof(item));
-    file.close();
-    cout << "Saglabats faila" << endl;
-    return 0;
-}
-
-int readFromFile(string filename) {
-    Item item;
-    fstream file;
-    file.open(filename,ios::in|ios::binary);
-    if (!file){
-        cout << "Kluda atverot failu" << endl;
-        return -1;
-    }
-    if (file.read((char*)&item,sizeof(item))) {
-        cout << endl
-             << left << setw(15) << "Nosaukums"
-             << left << setw(15) << "Cena"
-             << left << setw(15) << "Pieejams"
-             << left << setw(15) << "Pardots" << endl;
-        while(!file.eof()) {
-            item.displayItem();
-            file.read((char*)&item,sizeof(item));
-        }
-    }
-    else {
-        cout << "Kluda nolasot no faila" << endl;
-        return -1;
-    }
-    file.close();
-    return 0;
-}
-
+int writeToFile(Item item, string filename);
+int readFromFile(string filename);
 int sellProduct(string fileName, string productName);
 int searchProduct(string fileName, string productName);
 
@@ -180,7 +138,9 @@ int sellProduct(string fileName, string productName){
     fileObj_out.open(fileName, ios::trunc | ios::binary); //ieraksta izlaboto informaciju binary file
     while (productQuantityInteger > productInteger){
         product = fileData[productInteger];
-        fileObj_out.write((char*)&product, sizeof(product));
+        if( !(productInteger == soldProductInteger) ){
+            fileObj_out.write((char*)&product, sizeof(product));
+        }
         productInteger ++;
     }
     fileObj_out.close();
@@ -217,5 +177,46 @@ int searchProduct(string fileName, string productName){
     }
     file.close();
     cout << endl;
+    return 0;
+}
+
+int readFromFile(string filename) {
+    Item item;
+    fstream file;
+    file.open(filename,ios::in|ios::binary);
+    if (!file){
+        cout << "Kluda atverot failu" << endl;
+        return -1;
+    }
+    if (file.read((char*)&item,sizeof(item))) {
+        cout << endl
+             << left << setw(15) << "Nosaukums"
+             << left << setw(15) << "Cena"
+             << left << setw(15) << "Pieejams"
+             << left << setw(15) << "Pardots" << endl;
+        while(!file.eof()) {
+            item.displayItem();
+            file.read((char*)&item,sizeof(item));
+        }
+    }
+    else {
+        cout << "Kluda nolasot no faila" << endl;
+        return -1;
+    }
+    file.close();
+    return 0;
+}
+
+int writeToFile(Item item, string filename) {
+    item.readItem();
+    fstream file;
+    file.open(filename, ios::out|ios::binary|ios::app);
+    if (!file){
+        cout << "Kluda rakstot faila" << endl;
+        return -1;
+    }
+    file.write((char*)&item,sizeof(item));
+    file.close();
+    cout << "Saglabats faila" << endl;
     return 0;
 }
