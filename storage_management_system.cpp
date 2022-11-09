@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include <string.h>
+#include <vector>
 
 #define FILE_NAME "the-file.txt"
 
@@ -76,11 +77,12 @@ int readFromFile(string filename) {
     return 0;
 }
 
-int sellProduct(string file_name);
-int searchProduct(string file_name);
+int sellProduct(string fileName, string productName);
+int searchProduct(string fileName, string productName);
 
 int main() {
     Item item;
+    string input;
     int menuItem;
     cout << "----------NOLIKTAVA----------" << endl;
     cout << "0: Beigt darbibu" << endl;
@@ -91,8 +93,6 @@ int main() {
     while (true){
         cout << endl << "Izvele: ";
         cin >> menuItem;
-        cin.clear();
-        cin.ignore(1000, '\n');
         switch(menuItem) {
         case 0:
             return 0;
@@ -104,10 +104,14 @@ int main() {
             readFromFile(FILE_NAME);
             break;
         case 3:
-            sellProduct(FILE_NAME);
+            cout << "Kuru produktu pardod?" << endl;
+            cin >> input;
+            sellProduct(FILE_NAME, input);
             break;
         case 4:
-            searchProduct(FILE_NAME);
+            cout << "Meklet prouktu: ";
+            cin >> input;
+            searchProduct(FILE_NAME, input);
             break;
         default:
             cout << "\nKluda! Nepareiza izvelne!" << endl;
@@ -117,50 +121,78 @@ int main() {
     return 0;
 }
 
-int sellProduct(string fileName){
+int sellProduct(string fileName, string productName){
     Item product;
     Item soldProduct;
-    char soldName[20];
+    bool go = true;
+    vector<Item> fileData(10);
     double quantity;
     double sold;
-    fstream fileObj(fileName, ios::in | ios::out | ios::binary);
-    
-    cout << "Kuru produktu pardod?" << endl;
-    cin >> soldName;
-    cin.clear();
-    cin.ignore(1000, '\n');
+    int productInteger = 0;
+    int soldProductInteger = 0;
+    int productQuantityInteger = 0;
 
-    fileObj.open(fileName);
-    while (true){
-        fileObj.read((char*)&product, sizeof(product));
-        if (!strcmp(soldName, product.itemName)){
-            
-            return 0;
-        }
-        else if (fileObj.eof()){
-            cout << "Kluda: produkta ievade!" << endl;
-            return 0;
+    ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
+    if (!fileObj_in.is_open()){
+    cout << "Kluda atverot failu" << endl;
+    return -1;
+    }
+    while (go){    
+        fileObj_in.read((char *)&product, sizeof(product));
+        fileData[productInteger] = product;
+        productInteger++;
+        if (fileObj_in.eof()){
+            go = false;
         }
     }
+    productQuantityInteger = productInteger;
+    fileObj_in.close();
 
-    strcpy(soldProduct.itemName, product.itemName);
-    soldProduct.itemQuantity = product.itemQuantity - (double)1;
-    soldProduct.itemsSold = product.itemsSold + (double)1;
+    productInteger = 0;
+    go = true;
 
-    fileObj.write((char*)&soldProduct, sizeof(soldProduct));
+    fileObj_in.open(fileName, ios::in | ios::binary); //atrod pardoto produktu
+    if (!fileObj_in){
+        cout << "Kluda atverot failu" << endl;
+        return -1;
+    }
+    while (go){
+        fileObj_in.read((char*)&product, sizeof(product)); //izlabo pardota produkta informaciju
+        if (!strcmp(productName.c_str(), product.itemName)){
+            strcpy(soldProduct.itemName, product.itemName);
+            soldProduct.itemPrice = product.itemPrice;
+            soldProduct.itemQuantity = product.itemQuantity - (double)1;
+            soldProduct.itemsSold = product.itemsSold + (double)1;   
+            fileData[productInteger] = soldProduct;
+            go = false;
+        } else if (fileObj_in.eof()){
+            cout << "Kluda: produkta ievade!" << endl;
+            productInteger = 0;
+            return 0;
+        }
+        productInteger ++;
+    }
+    soldProductInteger = productInteger;
+    productInteger = 0;
+    fileObj_in.close();
+
+    ofstream fileObj_out;
+    fileObj_out.open(fileName, ios::trunc | ios::binary); //ieraksta izlaboto informaciju binary file
+    while (productQuantityInteger > productInteger){
+        product = fileData[productInteger];
+        fileObj_out.write((char*)&product, sizeof(product));
+        productInteger ++;
+    }
+    fileObj_out.close();
     
     return 0;
 }
 
-int searchProduct(string fileName){
+int searchProduct(string fileName, string productName){
     Item product;
     ifstream file;
-    string productName;
 
-    cout << "Meklet prouktu: ";
-    getline(cin, productName);
-
-    file.open(fileName,ios::in);
+    file.open(fileName, ios::in);
     if (!file){
         cout << "Kluda atverot failu" << endl;
         return -1;
