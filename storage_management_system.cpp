@@ -33,6 +33,7 @@ public:
     char *getItemName() { return itemName; }
 };
 
+int topThreeWorstSelling(string fileName);
 int writeToFile(Item item, string filename);
 int readFromFile(string filename);
 int sellProduct(string fileName, string productName);
@@ -71,11 +72,66 @@ int main() {
             cin >> input;
             searchProduct(FILE_NAME, input);
             break;
+        case 5:
+            topThreeWorstSelling(FILE_NAME);
+            break;
         default:
             cout << "\nKluda! Nepareiza izvelne!" << endl;
             return 0;
         }
     }
+    return 0;
+}
+
+int topThreeWorstSelling(string fileName){
+    vector<Item> fileData(4);
+    Item product, worstProduct, secondWorstProduct, thirdWorstProduct;
+    int productInteger = 0, productQuantityInteger = 0, worstIter = 0;
+    bool go = true;
+    
+    ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
+    if (!fileObj_in.is_open()){
+    cout << "Kluda atverot failu" << endl;
+    return -1;
+    }
+    while (!fileObj_in.eof()){
+        fileObj_in.read((char*)&product, sizeof(product));
+        fileData[productInteger] = product;
+        productInteger++;
+        if (fileData[productInteger].itemName == fileData[productInteger-1].itemName){
+            cout << "flag";
+            fileData.erase(fileData.begin() + productInteger-1);
+        }
+    }
+    productQuantityInteger = productInteger;
+    fileObj_in.close();
+  
+    for(productInteger = 0; productInteger < productQuantityInteger; productInteger++){
+       if (productInteger == 0){
+        worstProduct = fileData[0];
+       }
+
+       if (fileData[productInteger].itemsSold < worstProduct.itemsSold){
+        worstProduct = fileData[productInteger];
+        worstIter = productInteger;
+       }
+    }
+
+    cout << worstProduct.itemName << '\t' << worstProduct.itemsSold << endl;
+
+
+    cout << '\n' << '\n';
+    for (int i = 0; i < productQuantityInteger; i++){
+        cout << fileData[i].itemName << '\t' << fileData[i].itemsSold << endl;
+    }
+
+    fileData.erase(fileData.begin() + worstIter);
+
+    cout << '\n' << '\n';
+    for (int i = 0; i < productQuantityInteger; i++){
+        cout << fileData[i].itemName << '\t' << fileData[i].itemsSold << endl;
+    }
+
     return 0;
 }
 
@@ -157,7 +213,7 @@ int searchProduct(string fileName, string productName){
         cout << "Kluda atverot failu" << endl;
         return -1;
     }
-    if (file.read((char*)&product, sizeof(product))){
+    if (file.read((char*)&product, sizeof(product))){ //loops iet cauri produktiem lidz sakrit nosaukumi
         while (!file.eof()){
             if (product.getItemName() == productName){
                 cout << endl
