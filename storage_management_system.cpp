@@ -85,9 +85,14 @@ int main() {
 
 int topThreeWorstSelling(string fileName){
     vector<Item> fileData;
-    Item product, worstProduct, secondWorstProduct, thirdWorstProduct;
+    vector<Item> shortStorageData;
+    Item product;
+    Item worstProduct;
+    Item secondWorstProduct;
+    Item thirdWorstProduct;
     int productInteger = 0;
     int productQuantityInteger = 0;
+    int theWorst = 0;
     int worstIter = 0;
     bool go = true;
     
@@ -97,23 +102,46 @@ int topThreeWorstSelling(string fileName){
     return -1;
     }
     while (!fileObj_in.eof()){
-        fileData.push_back(product);
-        cout << product.itemName << '\t' << fileData[productInteger].itemName << endl;
-        productInteger++;
         fileObj_in.read((char*)&product, sizeof(product));
+        fileData.push_back(product);
+        productInteger++;
     }
+    fileData.pop_back();
+    productInteger--;
     productQuantityInteger = productInteger;
     fileObj_in.close();
     
+    theWorst = fileData[0].itemsSold; //atrod vismazako
+    for (int i = 0; i < productQuantityInteger; i++){
+        if (fileData[i].itemsSold < theWorst){
+            worstProduct = fileData[i];
+            theWorst = fileData[i].itemsSold;
+            worstIter = i;            
+        }
+    }
+    worstProduct.displayItem();
 
 
-    cout << '\n' << '\n'; //tiek pie visiem vektora datiem
-    for (int i = 1; i < productQuantityInteger; i++){
+    for (int i = 0; i < productQuantityInteger; i++){   //couts info
         cout << fileData[i].itemName << '\t' << fileData[i].itemsSold << endl;
-        fileData.pop_back();
+    }
+    //izmanto iso atminju lai izdzestu worstProduct no vektora
+    for (int i = 0; i < productQuantityInteger; i++){
+        if (strcmp(fileData[i].itemName, worstProduct.itemName) != 0){
+            shortStorageData.push_back(fileData[i]);
+        }
     }
     fileData.clear();
-    
+    for (int i = 0; shortStorageData.size() != 0; i++) {
+        fileData.push_back(shortStorageData[i]);
+        shortStorageData.pop_back();
+    }
+    cout << '\n' << '\n'; //tiek pie visiem vektora datiem
+    for (int i = 0; i + 1 < productQuantityInteger; i++){
+        cout << fileData[i].itemName << '\t' << fileData[i].itemsSold << endl;
+    }
+    fileData.clear();
+
     return 0;
 }
 
