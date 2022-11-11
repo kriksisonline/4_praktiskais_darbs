@@ -84,9 +84,11 @@ int main() {
 }
 
 int topThreeWorstSelling(string fileName){
-    vector<Item> fileData(4);
+    vector<Item> fileData;
     Item product, worstProduct, secondWorstProduct, thirdWorstProduct;
-    int productInteger = 0, productQuantityInteger = 0, worstIter = 0;
+    int productInteger = 0;
+    int productQuantityInteger = 0;
+    int worstIter = 0;
     bool go = true;
     
     ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
@@ -95,43 +97,23 @@ int topThreeWorstSelling(string fileName){
     return -1;
     }
     while (!fileObj_in.eof()){
-        fileObj_in.read((char*)&product, sizeof(product));
-        fileData[productInteger] = product;
+        fileData.push_back(product);
+        cout << product.itemName << '\t' << fileData[productInteger].itemName << endl;
         productInteger++;
-        if (fileData[productInteger].itemName == fileData[productInteger-1].itemName){
-            cout << "flag";
-            fileData.erase(fileData.begin() + productInteger-1);
-        }
+        fileObj_in.read((char*)&product, sizeof(product));
     }
     productQuantityInteger = productInteger;
     fileObj_in.close();
-  
-    for(productInteger = 0; productInteger < productQuantityInteger; productInteger++){
-       if (productInteger == 0){
-        worstProduct = fileData[0];
-       }
-
-       if (fileData[productInteger].itemsSold < worstProduct.itemsSold){
-        worstProduct = fileData[productInteger];
-        worstIter = productInteger;
-       }
-    }
-
-    cout << worstProduct.itemName << '\t' << worstProduct.itemsSold << endl;
+    
 
 
-    cout << '\n' << '\n';
-    for (int i = 0; i < productQuantityInteger; i++){
+    cout << '\n' << '\n'; //tiek pie visiem vektora datiem
+    for (int i = 1; i < productQuantityInteger; i++){
         cout << fileData[i].itemName << '\t' << fileData[i].itemsSold << endl;
+        fileData.pop_back();
     }
-
-    fileData.erase(fileData.begin() + worstIter);
-
-    cout << '\n' << '\n';
-    for (int i = 0; i < productQuantityInteger; i++){
-        cout << fileData[i].itemName << '\t' << fileData[i].itemsSold << endl;
-    }
-
+    fileData.clear();
+    
     return 0;
 }
 
