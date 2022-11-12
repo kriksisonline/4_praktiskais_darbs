@@ -92,7 +92,18 @@ int topThreeEarn(string fileName) {
     Item secndEarn;
     Item thirdEarn;
     
-
+    ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
+    if (!fileObj_in.is_open()) {
+    cout << "Kluda atverot failu" << endl;
+    return -1;
+    }
+    while (!fileObj_in.eof()) {
+        fileObj_in.read((char*)&product, sizeof(product));
+        if (!fileObj_in.eof()){
+            firstVect.push_back(product);
+        }
+    }
+    fileObj_in.close();
 
 
 }
@@ -105,8 +116,6 @@ int topThreeWorstSelling(string fileName) {
     Item worstProduct;
     Item secondWorstProduct;
     Item thirdWorstProduct;
-    int productInteger = 0;
-    int productQuantityInteger = 0;
     int theWorst = 0;
     
     ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
@@ -118,10 +127,8 @@ int topThreeWorstSelling(string fileName) {
         fileObj_in.read((char*)&product, sizeof(product));
         if (!fileObj_in.eof()){
             fileData.push_back(product);
-            productInteger++;
         }
     }
-    productQuantityInteger = productInteger;
     fileObj_in.close();
     
     // galvena logjika
