@@ -49,6 +49,8 @@ int main() {
     cout << "2: Paradit visus produktus" << endl;
     cout << "3: Pardot produktu" << endl;
     cout << "4: Meklet produktu" << endl;
+    cout << "5: TOP 3 vismazak pardotie produkti" << endl;
+
     while (true){
         cout << endl << "Izvele: ";
         cin >> menuItem;
@@ -85,7 +87,8 @@ int main() {
 
 int topThreeWorstSelling(string fileName){
     vector<Item> fileData;
-    vector<Item> shortStorageData;
+    vector<Item> fileDataExeptWorst;
+    vector<Item> fileDataExeptTwoWorst;
     Item product;
     Item worstProduct;
     Item secondWorstProduct;
@@ -111,37 +114,50 @@ int topThreeWorstSelling(string fileName){
     productQuantityInteger = productInteger;
     fileObj_in.close();
     
+    // galvena logjika
     theWorst = fileData[0].itemsSold; //atrod vismazako
-    for (int i = 0; i < productQuantityInteger; i++){
-        if (fileData[i].itemsSold < theWorst){
+    for (int i = 0; i <= fileData.size(); i++){
+        if (fileData[i].itemsSold <= theWorst){
             worstProduct = fileData[i];
-            theWorst = fileData[i].itemsSold;
-            worstIter = i;            
+            theWorst = fileData[i].itemsSold;         
         }
     }
-    worstProduct.displayItem();
-
-
-    for (int i = 0; i < productQuantityInteger; i++){   //couts info
-        cout << fileData[i].itemName << '\t' << fileData[i].itemsSold << endl;
+    for (int i = 0; i < fileData.size(); i++){ //ieliek jauna vektora bez worstProduct
+        if (strcmp(fileData[i].itemName, worstProduct.itemName)){
+            fileDataExeptWorst.push_back(fileData[i]);
+        }
     }
-    //izmanto iso atminju lai izdzestu worstProduct no vektora
+    theWorst = fileDataExeptWorst[0].itemsSold; //talak tapati logjika
+    for (int i = 0; i < fileDataExeptWorst.size(); i++){
+        if (fileDataExeptWorst[i].itemsSold <= theWorst){
+            secondWorstProduct = fileDataExeptWorst[i];  
+            theWorst = fileDataExeptWorst[i].itemsSold;
+        }
+    }
     for (int i = 0; i < productQuantityInteger; i++){
-        if (strcmp(fileData[i].itemName, worstProduct.itemName) != 0){
-            shortStorageData.push_back(fileData[i]);
+        if (strcmp(fileDataExeptWorst[i].itemName, secondWorstProduct.itemName)){
+            if (strcmp(fileData[i].itemName, worstProduct.itemName)) {
+                fileDataExeptTwoWorst.push_back(fileData[i]);
+            }
         }
     }
-    fileData.clear();
-    for (int i = 0; shortStorageData.size() != 0; i++) {
-        fileData.push_back(shortStorageData[i]);
-        shortStorageData.pop_back();
+    theWorst = fileDataExeptTwoWorst[0].itemsSold;
+    for (int i = 0; i < fileDataExeptTwoWorst.size(); i++){
+        if (fileDataExeptTwoWorst[i].itemsSold <= theWorst){
+            thirdWorstProduct = fileDataExeptTwoWorst[i];
+            theWorst = fileDataExeptTwoWorst[i].itemsSold;
+        }
     }
-    cout << '\n' << '\n'; //tiek pie visiem vektora datiem
-    for (int i = 0; i + 1 < productQuantityInteger; i++){
-        cout << fileData[i].itemName << '\t' << fileData[i].itemsSold << endl;
-    }
-    fileData.clear();
 
+
+    // cout << '\n' << '\n'; //tiek pie visiem vektora datiem
+    // for (int i = 0; i < productQuantityInteger; i++){
+    //     cout << fileDataExeptTwoWorst[i].itemName << '\t' << fileDataExeptTwoWorst[i].itemsSold << endl;
+    // }
+    
+    worstProduct.displayItem();
+    secondWorstProduct.displayItem();
+    thirdWorstProduct.displayItem();
     return 0;
 }
 
