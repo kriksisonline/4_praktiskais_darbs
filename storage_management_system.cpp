@@ -73,7 +73,12 @@ int main() {
             searchProduct(FILE_NAME, input);
             break;
         case 5:
+            cout << "# TOP 3 vismazak pardotie produki:" << endl;
             topThreeWorstSelling(FILE_NAME);
+            break;
+        case 6:
+            cout << "# TOP 3 pelnoshakie produkti:" << endl;
+            topThreeEarn(FILE_NAME);
             break;
         default:
             cout << "\nKluda! Nepareiza izvelne!" << endl;
@@ -88,9 +93,11 @@ int topThreeEarn(string fileName) {
     vector<Item> secndVect;
     vector<Item> thirdVect;
     Item product;
-    Item firsEarn;
+    Item firstEarn;
     Item secndEarn;
     Item thirdEarn;
+    int maxEarnings;
+    int earnings;
     
     ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
     if (!fileObj_in.is_open()) {
@@ -105,7 +112,76 @@ int topThreeEarn(string fileName) {
     }
     fileObj_in.close();
 
+    maxEarnings = firstVect[0].itemPrice * firstVect[0].itemsSold;
+    for (int i = 0; i < firstVect.size(); i++) {
+        earnings = firstVect[i].itemPrice * firstVect[i].itemsSold;
+        if (earnings >= maxEarnings) {
+            maxEarnings = earnings;
+            firstEarn = firstVect[i];
+        }
+    }
+    for (int i = 0; i < firstVect.size(); i++) { //ieliek jauna vektora bez worstProduct
+        if (strcmp (firstEarn.itemName, firstVect[i].itemName) == 0) {
+        } else {
+            secndVect.push_back(firstVect[i]);
+        }
+    }
 
+    maxEarnings = secndVect[0].itemPrice * secndVect[0].itemsSold;
+    for (int i = 0; i < firstVect.size(); i++) {
+        earnings = secndVect[i].itemPrice * secndVect[i].itemsSold;
+        if (earnings >= maxEarnings) {
+            maxEarnings = earnings;
+            secndEarn = secndVect[i];
+        }
+    }
+    for (int i = 0; i < secndVect.size(); i++) {
+        if (strcmp (firstEarn.itemName, secndVect[i].itemName) == 0) {
+        } else if (strcmp (secndEarn.itemName, secndVect[i].itemName) == 0) {
+        } else {
+            thirdVect.push_back (secndVect[i]);
+        }
+    }
+    maxEarnings = thirdVect[0].itemPrice * thirdVect[0].itemPrice;
+    for (int i = 0; i < secndVect.size(); i++) {
+        earnings = thirdVect[i].itemPrice * thirdVect[i].itemPrice;
+        if (earnings >= maxEarnings) {
+            maxEarnings = earnings;
+            thirdEarn = thirdVect[i];
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    firstEarn.displayItem();
+    cout << "Pelnja: " << firstEarn.itemPrice * firstEarn.itemsSold << endl;
+    secndEarn.displayItem();
+    cout << "Pelnja: " << secndEarn.itemPrice * secndEarn.itemsSold << endl;
+    thirdEarn.displayItem();
+    cout << "Pelnja: " << thirdEarn.itemPrice * thirdEarn.itemsSold << endl;
+
+    return 0;
 }
 
 int topThreeWorstSelling(string fileName) {
@@ -133,7 +209,6 @@ int topThreeWorstSelling(string fileName) {
     
     // galvena logjika
     theWorst = fileData[0].itemsSold; //atrod vismazako
-    
     for (int i = 0; i < fileData.size(); i++) {
         if (fileData[i].itemsSold <= theWorst) {
             worstProduct = fileData[i];
@@ -160,9 +235,6 @@ int topThreeWorstSelling(string fileName) {
             fileDataExeptTwoWorst.push_back(fileDataExeptWorst[i]);
         }        
     }
-
-    cout << '\n' << '\n' << "fileDataExeptWorst: "  << endl; //tiek pie visiem vektora datiem
-
     theWorst = fileDataExeptWorst[0].itemsSold;
     for (int i = 0; i < fileDataExeptTwoWorst.size(); i++) {
         if (fileDataExeptTwoWorst[i].itemsSold <= theWorst) {
@@ -318,5 +390,6 @@ void choiceInfo() {
     cout << "3: Pardot produktu" << '\n';
     cout << "4: Meklet produktu" << '\n';
     cout << "5: TOP 3 vismazak pardotie produkti" << '\n';
+    cout << "6: TOP 3 pelnoshakie produkti" << '\n';
     cout << "------------------------------------";
 }
