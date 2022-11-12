@@ -244,7 +244,6 @@ int topThreeBestSeller(string fileName) {
         if (fileDataExeptTwoWorst[i].itemsSold >= best) {
             thirdBestProduct = fileDataExeptTwoWorst[i];
             best = fileDataExeptTwoWorst[i].itemsSold;
-            cout << "thirdBestProduct " << fileDataExeptTwoWorst[i].itemName << " " << best << endl; 
         }
     }
     
