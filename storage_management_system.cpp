@@ -82,7 +82,7 @@ int main() {
     return 0;
 }
 
-int topThreeWorstSelling(string fileName){
+int topThreeWorstSelling(string fileName) {
     vector<Item> fileData;
     vector<Item> fileDataExeptWorst;
     vector<Item> fileDataExeptTwoWorst;
@@ -97,55 +97,59 @@ int topThreeWorstSelling(string fileName){
     bool go = true;
     
     ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
-    if (!fileObj_in.is_open()){
+    if (!fileObj_in.is_open()) {
     cout << "Kluda atverot failu" << endl;
     return -1;
     }
-    while (!fileObj_in.eof()){
+    while (!fileObj_in.eof()) {
         fileObj_in.read((char*)&product, sizeof(product));
-        fileData.push_back(product);
-        productInteger++;
+        if (!fileObj_in.eof()){
+            fileData.push_back(product);
+            productInteger++;
+        }
     }
-    fileData.pop_back();
-    productInteger--;
     productQuantityInteger = productInteger;
     fileObj_in.close();
     
     // galvena logjika
     theWorst = fileData[0].itemsSold; //atrod vismazako
-    for (int i = 0; i <= fileData.size(); i++){
-        if (fileData[i].itemsSold <= theWorst){
+    
+    for (int i = 0; i < fileData.size(); i++) {
+        if (fileData[i].itemsSold <= theWorst) {
             worstProduct = fileData[i];
-            theWorst = fileData[i].itemsSold;         
+            theWorst = fileData[i].itemsSold;
         }
     }
-    for (int i = 0; i < fileData.size(); i++){ //ieliek jauna vektora bez worstProduct
-        if (strcmp(fileData[i].itemName, worstProduct.itemName)){
+    for (int i = 0; i < fileData.size(); i++) { //ieliek jauna vektora bez worstProduct
+        if (strcmp(fileData[i].itemName, worstProduct.itemName) == 0) {
+        } else {
             fileDataExeptWorst.push_back(fileData[i]);
         }
     }
     theWorst = fileDataExeptWorst[0].itemsSold; //talak tapati logjika
-    for (int i = 0; i < fileDataExeptWorst.size(); i++){
-        if (fileDataExeptWorst[i].itemsSold <= theWorst){
+    for (int i = 0; i < fileData.size(); i++) {
+        if (fileDataExeptWorst[i].itemsSold <= theWorst) {
             secondWorstProduct = fileDataExeptWorst[i];  
             theWorst = fileDataExeptWorst[i].itemsSold;
         }
     }
-    for (int i = 0; i < productQuantityInteger; i++){
-        if (strcmp(fileDataExeptWorst[i].itemName, secondWorstProduct.itemName)){
-            if (strcmp(fileData[i].itemName, worstProduct.itemName)) {
-                fileDataExeptTwoWorst.push_back(fileData[i]);
-            }
-        }
+    for (int i = 0; i < fileDataExeptWorst.size(); i++) {
+        if (strcmp(fileDataExeptWorst[i].itemName, worstProduct.itemName) == 0){
+        } else if (strcmp(fileDataExeptWorst[i].itemName, secondWorstProduct.itemName) == 0) {
+        } else {
+            fileDataExeptTwoWorst.push_back(fileDataExeptWorst[i]);
+        }        
     }
-    theWorst = fileDataExeptTwoWorst[0].itemsSold;
-    for (int i = 0; i < fileDataExeptTwoWorst.size(); i++){
-        if (fileDataExeptTwoWorst[i].itemsSold <= theWorst){
+
+    cout << '\n' << '\n' << "fileDataExeptWorst: "  << endl; //tiek pie visiem vektora datiem
+
+    theWorst = fileDataExeptWorst[0].itemsSold;
+    for (int i = 0; i < fileDataExeptTwoWorst.size(); i++) {
+        if (fileDataExeptTwoWorst[i].itemsSold <= theWorst) {
             thirdWorstProduct = fileDataExeptTwoWorst[i];
             theWorst = fileDataExeptTwoWorst[i].itemsSold;
         }
     }
-
 
     // cout << '\n' << '\n'; //tiek pie visiem vektora datiem
     // for (int i = 0; i < productQuantityInteger; i++){
@@ -158,7 +162,7 @@ int topThreeWorstSelling(string fileName){
     return 0;
 }
 
-int sellProduct(string fileName, string productName){
+int sellProduct(string fileName, string productName) {
     Item product;
     Item soldProduct;
     bool go = true;
@@ -172,11 +176,11 @@ int sellProduct(string fileName, string productName){
     int productQuantityInteger = 0;
 
     ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
-    if (!fileObj_in.is_open()){
+    if (!fileObj_in.is_open()) {
     cout << "Kluda atverot failu" << endl;
     return -1;
     }
-    while (!fileObj_in.eof()){
+    while (!fileObj_in.eof()) {
         fileObj_in.read((char*)&product, sizeof(product));
         fileData.push_back(product);
         productInteger++;
@@ -186,12 +190,11 @@ int sellProduct(string fileName, string productName){
     productQuantityInteger = productInteger;
     fileObj_in.close();
 
-    for (int i = 0; i < productQuantityInteger; i++) {
-        if (!strcmp(productName.c_str(), fileData[i].itemName)) {
-            strcpy(soldProduct.itemName, product.itemName);
-            soldProduct.itemPrice = product.itemPrice;
-            soldProduct.itemQuantity = product.itemQuantity - (double)1;
-            soldProduct.itemsSold = product.itemsSold + (double)1;   
+    for (int i = 0; i < fileData.size(); i++) {
+        if (strcmp(fileData[i].itemName, productName.c_str()) == 0) {
+            soldProduct = fileData[i];
+            soldProduct.itemQuantity = soldProduct.itemQuantity - (double)1;
+            soldProduct.itemsSold = soldProduct.itemsSold + (double)1;
             soldFileData.push_back(soldProduct);
         } else {
             soldFileData.push_back(fileData[i]);
