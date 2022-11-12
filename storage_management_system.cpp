@@ -33,6 +33,7 @@ public:
     char *getItemName() { return itemName; }
 };
 
+int topThreeCheapest(string fileName);
 int topThreeWorstSelling(string fileName);
 int topThreeEarn(string fileName);
 int writeToFile(Item item, string filename);
@@ -80,11 +81,91 @@ int main() {
             cout << "# TOP 3 pelnoshakie produkti:" << endl;
             topThreeEarn(FILE_NAME);
             break;
+        case 7:
+            cout << "# TOP 3 letakie produkti:" << endl;
+            topThreeCheapest(FILE_NAME);
+            break;
         default:
             cout << "\nKluda! Nepareiza izvelne!" << endl;
             return 0;
         }
     }
+    return 0;
+}
+
+int topThreeCheapest(string fileName) {
+    vector<Item> firstVect;
+    vector<Item> secndVect;
+    vector<Item> thirdVect;
+    Item product;
+    Item firstCheap;
+    Item secndCheap;
+    Item thirdCheap;
+    int cheapest;
+    int cheap;
+    
+    ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
+    if (!fileObj_in.is_open()) {
+    cout << "Kluda atverot failu" << endl;
+    return -1;
+    }
+    while (!fileObj_in.eof()) {
+        fileObj_in.read((char*)&product, sizeof(product));
+        if (!fileObj_in.eof()){
+            firstVect.push_back(product);
+        }
+    }
+    fileObj_in.close();
+
+    cheapest = firstVect[0].itemPrice;
+    for (int i = 0; i < firstVect.size(); i++) {
+        cheap = firstVect[i].itemPrice;
+        if (cheapest >= cheap) {
+            cheapest = cheap;
+            firstCheap = firstVect[i];
+        }
+    }
+    for (int i = 0; i < firstVect.size(); i++) {
+        if (strcmp (firstCheap.itemName, firstVect[i].itemName) == 0) {
+        } else {
+            secndVect.push_back(firstVect[i]);
+        }
+    }
+
+    cheapest = secndVect[0].itemPrice;
+    for (int i = 0; i < secndVect.size(); i++) {
+        cheap = secndVect[i].itemPrice;
+        if (cheapest >= cheap) {
+            cheapest = cheap;
+            secndCheap = secndVect[i];
+        }
+    }
+    for (int i = 0; i < secndVect.size(); i++) {
+        if (strcmp (firstCheap.itemName, secndVect[i].itemName) == 0) {
+        } else if (strcmp (secndCheap.itemName, secndVect[i].itemName) == 0) {
+        } else {
+            thirdVect.push_back (secndVect[i]);
+        }
+    }
+    
+    cheapest = secndVect[0].itemPrice;
+    for (int i = 0; i < thirdVect.size(); i++) {
+        cheap = thirdVect[i].itemPrice;
+        if (cheapest >= cheap) {
+            cheapest = cheap;
+            thirdCheap = thirdVect[i];
+        }
+    }
+
+    // cout << '\n' << '\n'; //tiek pie visiem vektora datiem
+    // for (int i = 0; i < secndVect.size(); i++){
+    //     cout << secndVect[i].itemName << '\t' << secndVect[i].itemPrice << endl;
+    // }
+
+    firstCheap.displayItem();
+    secndCheap.displayItem();
+    thirdCheap.displayItem();
+
     return 0;
 }
 
@@ -142,6 +223,7 @@ int topThreeEarn(string fileName) {
             thirdVect.push_back (secndVect[i]);
         }
     }
+
     maxEarnings = thirdVect[0].itemPrice * thirdVect[0].itemPrice;
     for (int i = 0; i < secndVect.size(); i++) {
         earnings = thirdVect[i].itemPrice * thirdVect[i].itemPrice;
@@ -150,29 +232,6 @@ int topThreeEarn(string fileName) {
             thirdEarn = thirdVect[i];
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     firstEarn.displayItem();
     cout << "Pelnja: " << firstEarn.itemPrice * firstEarn.itemsSold << endl;
@@ -222,7 +281,7 @@ int topThreeWorstSelling(string fileName) {
         }
     }
     theWorst = fileDataExeptWorst[0].itemsSold; //talak tapati logjika
-    for (int i = 0; i < fileData.size(); i++) {
+    for (int i = 0; i < fileDataExeptWorst.size(); i++) {
         if (fileDataExeptWorst[i].itemsSold <= theWorst) {
             secondWorstProduct = fileDataExeptWorst[i];  
             theWorst = fileDataExeptWorst[i].itemsSold;
@@ -267,7 +326,7 @@ int sellProduct(string fileName, string productName) {
     int soldProductInteger = 0;
     int productQuantityInteger = 0;
 
-    ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
+    ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info
     if (!fileObj_in.is_open()) {
     cout << "Kluda atverot failu" << endl;
     return -1;
@@ -391,5 +450,6 @@ void choiceInfo() {
     cout << "4: Meklet produktu" << '\n';
     cout << "5: TOP 3 vismazak pardotie produkti" << '\n';
     cout << "6: TOP 3 pelnoshakie produkti" << '\n';
+    cout << "7: TOP 3 letakie produkti" << '\n';
     cout << "------------------------------------";
 }
