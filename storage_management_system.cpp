@@ -34,6 +34,7 @@ public:
 };
 
 int topThreeWorstSelling(string fileName);
+int topThreeEarn(string fileName);
 int writeToFile(Item item, string filename);
 int readFromFile(string filename);
 int sellProduct(string fileName, string productName);
@@ -82,6 +83,20 @@ int main() {
     return 0;
 }
 
+int topThreeEarn(string fileName) {
+    vector<Item> firstVect;
+    vector<Item> secndVect;
+    vector<Item> thirdVect;
+    Item product;
+    Item firsEarn;
+    Item secndEarn;
+    Item thirdEarn;
+    
+
+
+
+}
+
 int topThreeWorstSelling(string fileName) {
     vector<Item> fileData;
     vector<Item> fileDataExeptWorst;
@@ -93,8 +108,6 @@ int topThreeWorstSelling(string fileName) {
     int productInteger = 0;
     int productQuantityInteger = 0;
     int theWorst = 0;
-    int worstIter = 0;
-    bool go = true;
     
     ifstream fileObj_in(fileName, ios::in | ios::binary); //ieseivo vektora all data info 
     if (!fileObj_in.is_open()) {
