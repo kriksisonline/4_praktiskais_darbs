@@ -38,21 +38,18 @@ int writeToFile(Item item, string filename);
 int readFromFile(string filename);
 int sellProduct(string fileName, string productName);
 int searchProduct(string fileName, string productName);
+void choiceInfo();
 
 int main() {
     Item item;
     string input;
     int menuItem;
-    cout << "----------NOLIKTAVA----------" << endl;
-    cout << "0: Beigt darbibu" << endl;
-    cout << "1: Pievienot produktu" << endl;
-    cout << "2: Paradit visus produktus" << endl;
-    cout << "3: Pardot produktu" << endl;
-    cout << "4: Meklet produktu" << endl;
-    cout << "5: TOP 3 vismazak pardotie produkti" << endl;
+    cout << "Loading..." << '\n' << endl;
+    cout << "*********************NOLIKTAVA*********************" << endl;
 
-    while (true){
-        cout << endl << "Izvele: ";
+    while (true) {
+        choiceInfo();
+        cout << endl << "Kada ir Tava izvele?: ";
         cin >> menuItem;
         switch(menuItem) {
         case 0:
@@ -301,4 +298,16 @@ int writeToFile(Item item, string filename) {
     file.close();
     cout << "Saglabats faila" << endl;
     return 0;
+}
+
+void choiceInfo() {
+    cout << '\n';
+    cout << "---------------IZVELNE--------------" << '\n'; 
+    cout << "0: Beigt darbibu" << '\n';
+    cout << "1: Pievienot produktu" << '\n';
+    cout << "2: Paradit visus produktus" << '\n';
+    cout << "3: Pardot produktu" << '\n';
+    cout << "4: Meklet produktu" << '\n';
+    cout << "5: TOP 3 vismazak pardotie produkti" << '\n';
+    cout << "------------------------------------";
 }
