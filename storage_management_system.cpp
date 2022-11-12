@@ -162,7 +162,9 @@ int sellProduct(string fileName, string productName){
     Item product;
     Item soldProduct;
     bool go = true;
-    vector<Item> fileData(10);
+    vector<Item> fileData;
+    vector<Item> soldFileData;
+
     double quantity;
     double sold;
     int productInteger = 0;
@@ -174,56 +176,40 @@ int sellProduct(string fileName, string productName){
     cout << "Kluda atverot failu" << endl;
     return -1;
     }
-    while (go){    
-        fileObj_in.read((char *)&product, sizeof(product));
-        fileData[productInteger] = product;
+    while (!fileObj_in.eof()){
+        fileObj_in.read((char*)&product, sizeof(product));
+        fileData.push_back(product);
         productInteger++;
-        if (fileObj_in.eof()){
-            go = false;
-        }
     }
+    fileData.pop_back();
+    productInteger--;
     productQuantityInteger = productInteger;
     fileObj_in.close();
 
-    productInteger = 0;
-    go = true;
-
-    fileObj_in.open(fileName, ios::in | ios::binary); //atrod pardoto produktu
-    if (!fileObj_in){
-        cout << "Kluda atverot failu" << endl;
-        return -1;
-    }
-    while (go){
-        fileObj_in.read((char*)&product, sizeof(product)); //izlabo pardota produkta informaciju
-        if (!strcmp(productName.c_str(), product.itemName)){
+    for (int i = 0; i < productQuantityInteger; i++) {
+        if (!strcmp(productName.c_str(), fileData[i].itemName)) {
             strcpy(soldProduct.itemName, product.itemName);
             soldProduct.itemPrice = product.itemPrice;
             soldProduct.itemQuantity = product.itemQuantity - (double)1;
             soldProduct.itemsSold = product.itemsSold + (double)1;   
-            fileData[productInteger] = soldProduct;
-            go = false;
-        } else if (fileObj_in.eof()){
-            cout << "Kluda: produkta ievade!" << endl;
-            productInteger = 0;
-            return 0;
+            soldFileData.push_back(soldProduct);
+        } else {
+            soldFileData.push_back(fileData[i]);
         }
-        productInteger ++;
     }
-    soldProductInteger = productInteger;
-    productInteger = 0;
-    fileObj_in.close();
-
-    ofstream fileObj_out;
-    fileObj_out.open(fileName, ios::trunc | ios::binary); //ieraksta izlaboto informaciju binary file
-    while (productQuantityInteger > productInteger){
-        product = fileData[productInteger];
-        if( !(productInteger == soldProductInteger) ){
-            fileObj_out.write((char*)&product, sizeof(product));
-        }
-        productInteger ++;
-    }
-    fileObj_out.close();
     
+    remove(fileName.c_str());
+    fstream file;
+    file.open(fileName, ios::out|ios::binary|ios::app);
+    if (!file){
+        cout << "Kluda rakstot faila" << endl;
+        return -1;
+    }
+    for (int i = 0; i < soldFileData.size(); i++) {
+    file.write((char*)&soldFileData[i],sizeof(soldFileData[i]));
+    }
+    file.close();
+
     return 0;
 }
 
