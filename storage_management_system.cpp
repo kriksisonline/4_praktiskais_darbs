@@ -148,6 +148,19 @@ int productAssort(string fileName, double balance) {
     }
     fileObj_in.close();
     while(purchasable) {
+        catalog.clear();
+        ifstream fileObj_in(fileName, ios::in | ios::binary);
+        if (!fileObj_in.is_open()) {
+        cout << "Kluda atverot failu" << endl;
+        return -1;
+        }
+        while (!fileObj_in.eof()) {
+            fileObj_in.read((char*)&product, sizeof(product));
+            if (!fileObj_in.eof()){
+                catalog.push_back(product);
+            }
+        }
+        fileObj_in.close();
         purchasable = false;
         for(int i = 0; i <= catalog.size()-1; i++) {
             if(catalog[i].itemQuantity > 0 && catalog[i].itemPrice <= balance) {
