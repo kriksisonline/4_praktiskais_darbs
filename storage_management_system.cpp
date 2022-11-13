@@ -5,6 +5,9 @@
 #include <vector>
 #include <cmath>
 
+#include <map>
+#include <algorithm>
+
 #define FILE_NAME "the-file.txt"
 
 using namespace std;
@@ -50,7 +53,7 @@ void choiceInfo();
 int productAssort(string fileName, double balance);
 int topThreeMostAvailable(string fileName);
 int topThreeLeastAvailable(string fileName);
-
+bool exists_in_vector(vector<Item> vec, string product);
 
 int main() {
     Item item;
@@ -129,9 +132,9 @@ int main() {
 
 int productAssort(string fileName, double balance) {
     vector<Item> catalog;
-    vector<Item> cart;
-    vector<double> quantityStarting;
+    map <string, int> itemInfo;
     Item product;
+    bool purchasable = true;
     ifstream fileObj_in(fileName, ios::in | ios::binary);
     if (!fileObj_in.is_open()) {
     cout << "Kluda atverot failu" << endl;
@@ -141,27 +144,31 @@ int productAssort(string fileName, double balance) {
         fileObj_in.read((char*)&product, sizeof(product));
         if (!fileObj_in.eof()){
             catalog.push_back(product);
-            if(product.itemQuantity > 0) {
-                quantityStarting.push_back(product.itemQuantity);
-            }
         }
     }
     fileObj_in.close();
-    for(int i = 0; i <= catalog.size()-1; i++) {
-        if(catalog[i].itemQuantity > 0 && catalog[i].itemPrice <= balance) {
-            sellProduct(FILE_NAME,catalog[i].itemName);
-            balance -= catalog[i].itemPrice;
-            cart.push_back(catalog[i]);
-            
+    while(purchasable) {
+        purchasable = false;
+        for(int i = 0; i <= catalog.size()-1; i++) {
+            if(catalog[i].itemQuantity > 0 && catalog[i].itemPrice <= balance) {
+                sellProduct(FILE_NAME,catalog[i].itemName);
+                balance -= catalog[i].itemPrice;
+                itemInfo[catalog[i].itemName] += 1;
+                purchasable = true;
+            }
         }
     }
+ 
     double receiptSum = 0;
-    cout << "Nopirktas preces:" << endl;
-    cout << "Daudzums: " << cart.size() << "\n" << endl;
-    for(int i = 0; i <= cart.size()-1; i++) {
-        cout << "Prece: " << cart[i].itemName << endl;
-        cout << "Cena: " << cart[i].itemPrice << endl;
-        receiptSum += cart[i].itemPrice;
+    cout << "Nopirktas preces:\n" << endl;
+    for (const auto& [key, value] : itemInfo) {
+        cout << "Prece: " << key << "\nDaudzums: " << value << endl;
+        for(auto itm : catalog) {
+            if(itm.itemName == key){
+                cout << "Cena: " << itm.itemPrice << endl;
+                receiptSum += itm.itemPrice ;
+            }
+        }
         cout << endl;
     }
     cout << endl;
@@ -266,9 +273,9 @@ int topThreeLeastAvailable(string fileName){
     fileObj_in.close();
 
     leastAvailable = firstVect[0].itemQuantity;
-    for (int i = 0; i < firstVect.size(); i++) {
+    for (int i = 0; i < firstVect.size()-1; i++) {
         available = firstVect[i].itemQuantity;
-        if (leastAvailable >= available) {
+        if (leastAvailable >= available && leastAvailable >=0 ) {
             leastAvailable = available;
             firstAvail = firstVect[i];
         }
@@ -283,7 +290,7 @@ int topThreeLeastAvailable(string fileName){
     leastAvailable = secndVect[0].itemQuantity;
     for (int i = 0; i < secndVect.size(); i++) {
         available = secndVect[i].itemQuantity;
-        if (leastAvailable >= available) {
+        if (leastAvailable >= available && leastAvailable >=0) {
             leastAvailable = available;
             secndAvail = secndVect[i];
         }
@@ -299,7 +306,7 @@ int topThreeLeastAvailable(string fileName){
     leastAvailable = secndVect[0].itemQuantity;
     for (int i = 0; i < thirdVect.size(); i++) {
         available = thirdVect[i].itemQuantity;
-        if (leastAvailable >= available) {
+        if (leastAvailable >= available && leastAvailable >=0) {
             leastAvailable = available;
             thirdAvail = thirdVect[i];
         }
@@ -312,6 +319,14 @@ int topThreeLeastAvailable(string fileName){
     return 0;
 }
 
+bool exists_in_vector(vector<Item> vec, string product) {
+    for(int j = 0; j <= vec.size();j++) {
+        if(vec[j].itemName == product) {
+            return true;
+        }
+    }
+    return false;
+}
 
 bool compare(double a, double b) {
     return (fabs(a - b) < 0.01);
