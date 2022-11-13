@@ -47,10 +47,16 @@ int sellProduct(string fileName, string productName);
 int searchProduct(string fileName, string productName);
 void choiceInfo();
 
+int productAssort(string fileName, double balance);
+int topThreeMostAvailable(string fileName);
+int topThreeLeastAvailable(string fileName);
+
+
 int main() {
     Item item;
     string input;
     int menuItem;
+    double balance;
     cout << "Loading..." << '\n' << endl;
     cout << "*********************NOLIKTAVA*********************" << endl;
 
@@ -102,6 +108,17 @@ int main() {
             cout << "# TOP 3 pardotakie produkti:" << endl;
             topThreeBestSeller(FILE_NAME);
             break;
+        case 11:
+            cout << "Ievadiet naudas summu: " << endl;
+            cin >> balance;
+            productAssort(FILE_NAME, balance);
+            break;
+        case 12:
+            topThreeMostAvailable(FILE_NAME);
+            break;
+        case 13:
+            topThreeLeastAvailable(FILE_NAME);
+            break;
         default:
             cout << "\nKluda! Nepareiza izvelne!" << endl;
             return 0;
@@ -109,6 +126,192 @@ int main() {
     }
     return 0;
 }
+
+int productAssort(string fileName, double balance) {
+    vector<Item> catalog;
+    vector<Item> cart;
+    vector<double> quantityStarting;
+    Item product;
+    ifstream fileObj_in(fileName, ios::in | ios::binary);
+    if (!fileObj_in.is_open()) {
+    cout << "Kluda atverot failu" << endl;
+    return -1;
+    }
+    while (!fileObj_in.eof()) {
+        fileObj_in.read((char*)&product, sizeof(product));
+        if (!fileObj_in.eof()){
+            catalog.push_back(product);
+            if(product.itemQuantity > 0) {
+                quantityStarting.push_back(product.itemQuantity);
+            }
+        }
+    }
+    fileObj_in.close();
+    for(int i = 0; i <= catalog.size()-1; i++) {
+        if(catalog[i].itemQuantity > 0 && catalog[i].itemPrice <= balance) {
+            sellProduct(FILE_NAME,catalog[i].itemName);
+            balance -= catalog[i].itemPrice;
+            cart.push_back(catalog[i]);
+            
+        }
+    }
+    double receiptSum = 0;
+    cout << "Nopirktas preces:" << endl;
+    cout << "Daudzums: " << cart.size() << "\n" << endl;
+    for(int i = 0; i <= cart.size()-1; i++) {
+        cout << "Prece: " << cart[i].itemName << endl;
+        cout << "Cena: " << cart[i].itemPrice << endl;
+        receiptSum += cart[i].itemPrice;
+        cout << endl;
+    }
+    cout << endl;
+    cout << "Kopsumma: " << receiptSum << endl;
+    cout << "Bilance: " << balance << endl;
+    return 0;
+}
+
+int topThreeMostAvailable(string fileName) {
+    vector<Item> firstVect;
+    vector<Item> secndVect;
+    vector<Item> thirdVect;
+    Item product;
+    Item firstAvail;
+    Item secndAvail;
+    Item thirdAvail;
+    double mostAvailable;
+    double available;
+    
+    ifstream fileObj_in(fileName, ios::in | ios::binary);
+    if (!fileObj_in.is_open()) {
+    cout << "Kluda atverot failu" << endl;
+    return -1;
+    }
+    while (!fileObj_in.eof()) {
+        fileObj_in.read((char*)&product, sizeof(product));
+        if (!fileObj_in.eof()){
+            firstVect.push_back(product);
+        }
+    }
+    fileObj_in.close();
+
+    mostAvailable = firstVect[0].itemQuantity;
+    for (int i = 0; i < firstVect.size(); i++) {
+        available = firstVect[i].itemQuantity;
+        if (mostAvailable <= available) {
+            mostAvailable = available;
+            firstAvail = firstVect[i];
+        }
+    }
+    for (int i = 0; i < firstVect.size(); i++) {
+        if (strcmp (firstAvail.itemName, firstVect[i].itemName) == 0) {
+        } else {
+            secndVect.push_back(firstVect[i]);
+        }
+    }
+
+    mostAvailable = secndVect[0].itemQuantity;
+    for (int i = 0; i < secndVect.size(); i++) {
+        available = secndVect[i].itemQuantity;
+        if (mostAvailable <= available) {
+            mostAvailable = available;
+            secndAvail = secndVect[i];
+        }
+    }
+    for (int i = 0; i < secndVect.size(); i++) {
+        if (strcmp (firstAvail.itemName, secndVect[i].itemName) == 0) {
+        } else if (strcmp (secndAvail.itemName, secndVect[i].itemName) == 0) {
+        } else {
+            thirdVect.push_back (secndVect[i]);
+        }
+    }
+    
+    mostAvailable = secndVect[0].itemQuantity;
+    for (int i = 0; i < thirdVect.size(); i++) {
+        available = thirdVect[i].itemQuantity;
+        if (mostAvailable <= available) {
+            mostAvailable = available;
+            thirdAvail = thirdVect[i];
+        }
+    }
+
+    firstAvail.displayItem();
+    secndAvail.displayItem();
+    thirdAvail.displayItem();
+
+    return 0;
+}
+
+int topThreeLeastAvailable(string fileName){ 
+    vector<Item> firstVect;
+    vector<Item> secndVect;
+    vector<Item> thirdVect;
+    Item product;
+    Item firstAvail;
+    Item secndAvail;
+    Item thirdAvail;
+    double leastAvailable;
+    double available;
+    
+    ifstream fileObj_in(fileName, ios::in | ios::binary);
+    if (!fileObj_in.is_open()) {
+    cout << "Kluda atverot failu" << endl;
+    return -1;
+    }
+    while (!fileObj_in.eof()) {
+        fileObj_in.read((char*)&product, sizeof(product));
+        if (!fileObj_in.eof()){
+            firstVect.push_back(product);
+        }
+    }
+    fileObj_in.close();
+
+    leastAvailable = firstVect[0].itemQuantity;
+    for (int i = 0; i < firstVect.size(); i++) {
+        available = firstVect[i].itemQuantity;
+        if (leastAvailable >= available) {
+            leastAvailable = available;
+            firstAvail = firstVect[i];
+        }
+    }
+    for (int i = 0; i < firstVect.size(); i++) {
+        if (strcmp (firstAvail.itemName, firstVect[i].itemName) == 0) {
+        } else {
+            secndVect.push_back(firstVect[i]);
+        }
+    }
+
+    leastAvailable = secndVect[0].itemQuantity;
+    for (int i = 0; i < secndVect.size(); i++) {
+        available = secndVect[i].itemQuantity;
+        if (leastAvailable >= available) {
+            leastAvailable = available;
+            secndAvail = secndVect[i];
+        }
+    }
+    for (int i = 0; i < secndVect.size(); i++) {
+        if (strcmp (firstAvail.itemName, secndVect[i].itemName) == 0) {
+        } else if (strcmp (secndAvail.itemName, secndVect[i].itemName) == 0) {
+        } else {
+            thirdVect.push_back (secndVect[i]);
+        }
+    }
+    
+    leastAvailable = secndVect[0].itemQuantity;
+    for (int i = 0; i < thirdVect.size(); i++) {
+        available = thirdVect[i].itemQuantity;
+        if (leastAvailable >= available) {
+            leastAvailable = available;
+            thirdAvail = thirdVect[i];
+        }
+    }
+
+    firstAvail.displayItem();
+    secndAvail.displayItem();
+    thirdAvail.displayItem();
+
+    return 0;
+}
+
 
 bool compare(double a, double b) {
     return (fabs(a - b) < 0.01);
@@ -685,5 +888,9 @@ void choiceInfo() {
     cout << "8: TOP 3 dargakie produkti" << '\n';
     cout << "9: TOP 3 slikti pelnoshie produkti" << '\n';
     cout << "10: TOP 3 pardotakie produkti" << '\n';
+
+    cout << "11: Produktu asorti" << '\n';
+    cout << "12: TOP 3 visvairak pieejamie produkti" << '\n';
+    cout << "13: TOP 3 vismazak pieejamie produkti" << '\n';
     cout << "------------------------------------";
 }
